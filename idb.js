@@ -1,4 +1,3 @@
-/* Simple IndexedDB helper (small) */
 const IDB = (() => {
   const DB_NAME = 'streak-db-v1', DB_VER = 1;
   let dbp = null;
@@ -8,13 +7,10 @@ const IDB = (() => {
       const req = indexedDB.open(DB_NAME, DB_VER);
       req.onupgradeneeded = e => {
         const db = e.target.result;
-        if (!db.objectStoreNames.contains('users')) {
-          const u = db.createObjectStore('users', { keyPath: 'username' });
-        }
+        if (!db.objectStoreNames.contains('users')) db.createObjectStore('users', { keyPath: 'username' });
         if (!db.objectStoreNames.contains('tasks')) {
           const t = db.createObjectStore('tasks', { keyPath: 'id', autoIncrement:true });
           t.createIndex('by_user','user',{unique:false});
-          t.createIndex('by_streak','streak',{unique:false});
         }
       };
       req.onsuccess = ()=>resolve(req.result);
@@ -77,9 +73,9 @@ const IDB = (() => {
         req.onerror = ()=>reject(req.error);
       }));
     },
-    async getAllTasks(){
-      return tx(['tasks'],'readonly', t => new Promise((resolve,reject)=>{
-        const req = t.objectStore('tasks').getAll();
+    async getAllUsers(){
+      return tx(['users'],'readonly', t => new Promise((resolve,reject)=>{
+        const req = t.objectStore('users').getAll();
         req.onsuccess = ()=>resolve(req.result);
         req.onerror = ()=>reject(req.error);
       }));
