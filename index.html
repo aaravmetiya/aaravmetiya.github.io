@@ -1,23 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>🔥 Streak Tracker</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json" />
 </head>
 <body>
 
-<div id="login-screen" class="center">
+<div id="auth-screen" class="center">
   <h1>🔥 Streak Tracker</h1>
-  <button id="googleLogin">Sign in with Google</button>
+
+  <input id="username" placeholder="Username">
+  <input id="password" type="password" placeholder="Password">
+
+  <button onclick="login()">Login</button>
+  <button onclick="signup()">Create Account</button>
+
+  <p id="authMessage"></p>
 </div>
 
 <div id="app-screen" class="hidden">
   <h2 id="welcome"></h2>
 
-  <input id="taskInput" placeholder="Add task...">
+  <input id="taskInput" placeholder="Add a new task">
   <button onclick="addTask()">Add</button>
 
   <h3>Your Streaks ⏳</h3>
@@ -30,10 +37,8 @@
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js"></script>
 <script src="firebase.js"></script>
 <script src="script.js"></script>
-
 </body>
 </html>
