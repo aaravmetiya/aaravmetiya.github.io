@@ -1,32 +1,57 @@
-let user;
+let currentUser = null;
 
-auth.onAuthStateChanged(async u => {
-  if (u) {
-    user = u;
-    document.getElementById("login-screen").classList.add("hidden");
-    document.getElementById("app-screen").classList.remove("hidden");
-    document.getElementById("welcome").innerText = `👋 Welcome, ${u.displayName}`;
-    loadTasks();
-    loadLeaderboard();
-  }
-});
+async function signup() {
+  const user = document.getElementById("username").value.trim();
+  const pass = document.getElementById("password").value.trim();
 
-document.getElementById("googleLogin").onclick = () => {
-  auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
-};
+  if (!user || !pass) return showMessage("❌ Fill all fields");
+
+  const exists = await db.collection("users").doc(user).get();
+  if (exists.exists) return showMessage("⚠ Username already exists");
+
+  const hash = btoa(pass); // simple reversible encoding
+
+  await db.collection("users").doc(user).set({
+    password: hash,
+    created: Date.now()
+  });
+
+  showMessage("✅ Account created — now login");
+}
+
+async function login() {
+  const user = document.getElementById("username").value.trim();
+  const pass = document.getElementById("password").value.trim();
+
+  const record = await db.collection("users").doc(user).get();
+  if (!record.exists) return showMessage("❌ User not found");
+
+  if (record.data().password !== btoa(pass))
+    return showMessage("❌ Incorrect password");
+
+  currentUser = user;
+  localStorage.setItem("loggedIn", user);
+
+  document.getElementById("auth-screen").classList.add("hidden");
+  document.getElementById("app-screen").classList.remove("hidden");
+  document.getElementById("welcome").innerText = `👋 Welcome, ${user}!`;
+
+  loadTasks();
+  loadLeaderboard();
+}
 
 function logout() {
-  auth.signOut();
+  localStorage.removeItem("loggedIn");
   location.reload();
 }
 
 async function addTask() {
-  const name = document.getElementById("taskInput").value.trim();
-  if (!name) return;
+  const task = document.getElementById("taskInput").value.trim();
+  if (!task) return;
 
   await db.collection("tasks").add({
-    user: user.uid,
-    name,
+    user: currentUser,
+    name: task,
     streak: 0,
     last: ""
   });
@@ -38,44 +63,49 @@ async function updateStreak(id, last, streak) {
   const today = new Date().toLocaleDateString();
   if (today !== last) streak++;
 
-  await db.collection("tasks").doc(id).update({
-    last: today,
-    streak
-  });
-
-  new Notification("🔥 Streak Updated!", { body: `You're on a ${streak} day streak!` });
+  await db.collection("tasks").doc(id).update({ last: today, streak });
 
   loadTasks();
   loadLeaderboard();
 }
 
 async function loadTasks() {
-  const res = await db.collection("tasks").where("user", "==", user.uid).get();
+  const res = await db.collection("tasks").where("user", "==", currentUser).get();
   const list = document.getElementById("taskList");
   list.innerHTML = "";
 
   res.forEach(doc => {
-    const data = doc.data();
+    const t = doc.data();
     list.innerHTML += `
       <div class="task">
-        <h3>${data.name}</h3>
-        <p>🔥 <span class="fire">${data.streak}</span> days</p>
-        <button onclick="updateStreak('${doc.id}', '${data.last}', ${data.streak})">Mark Done</button>
+        <h3>${t.name}</h3>
+        <p>🔥 <span class="fire">${t.streak}</span> days</p>
+        <button onclick="updateStreak('${doc.id}', '${t.last}', ${t.streak})">Mark Done</button>
       </div>
     `;
   });
 }
 
 async function loadLeaderboard() {
-  const res = await db.collection("tasks")
-    .orderBy("streak", "desc")
-    .limit(5)
-    .get();
-
+  const res = await db.collection("tasks").orderBy("streak", "desc").limit(5).get();
   const lb = document.getElementById("leaderboard");
   lb.innerHTML = "";
 
-  res.forEach(task => {
-    lb.innerHTML += `<p>🔥 ${task.data().name}: <strong>${task.data().streak}</strong> days</p>`;
+  res.forEach(doc => {
+    const t = doc.data();
+    lb.innerHTML += `<p>🔥 ${t.name}: <strong>${t.streak}</strong> days</p>`;
   });
+}
+
+function showMessage(msg) {
+  document.getElementById("authMessage").innerText = msg;
+}
+
+if (localStorage.getItem("loggedIn")) {
+  document.getElementById("auth-screen").classList.add("hidden");
+  document.getElementById("app-screen").classList.remove("hidden");
+  currentUser = localStorage.getItem("loggedIn");
+  document.getElementById("welcome").innerText = `👋 Welcome back, ${currentUser}`;
+  loadTasks();
+  loadLeaderboard();
 }
