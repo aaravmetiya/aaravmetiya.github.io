@@ -1,67 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Streak Tracker</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🔥 Streak Tracker</title>
+  <link rel="stylesheet" href="style.css">
   <link rel="manifest" href="manifest.json">
-  <style>
-    body { font-family: Arial, sans-serif; text-align: center; padding: 30px; }
-    button { padding: 10px 20px; margin: 10px; cursor: pointer; }
-    .task { border: 1px solid #000; padding: 10px; margin: 15px; }
-  </style>
 </head>
 <body>
+<div id="login-screen" class="center">
+  <h1>🔥 Streak Tracker</h1>
+  <input id="username" placeholder="Enter Username">
+  <button onclick="login()">Login</button>
+</div>
 
-<h1>🔥 Task Streak Tracker</h1>
-<p>Track your consistency daily.</p>
+<div id="main-screen" class="hidden">
+  <h2 id="welcome"></h2>
 
-<input id="taskInput" placeholder="Enter a task name">
-<button onclick="addTask()">Add Task</button>
+  <input id="taskInput" placeholder="Add a new task...">
+  <button onclick="addTask()">Add Task</button>
 
-<div id="taskList"></div>
+  <div id="taskList"></div>
 
-<script>
-  let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+  <button class="logout" onclick="logout()">Logout</button>
+</div>
 
-  function save() {
-    localStorage.setItem("tasks", JSON.stringify(tasks));
-    render();
-  }
-
-  function addTask() {
-    const name = document.getElementById('taskInput').value.trim();
-    if (!name) return;
-    tasks.push({ name, streak: 0, last: "" });
-    save();
-  }
-
-  function updateStreak(index) {
-    const today = new Date().toLocaleDateString();
-    if (tasks[index].last !== today) {
-      tasks[index].streak++;
-      tasks[index].last = today;
-    }
-    save();
-  }
-
-  function render() {
-    const container = document.getElementById('taskList');
-    container.innerHTML = "";
-    tasks.forEach((t, i) => {
-      container.innerHTML += `
-      <div class='task'>
-        <h3>${t.name}</h3>
-        <p>🔥 Streak: ${t.streak} days</p>
-        <button onclick="updateStreak(${i})">Mark Today Done</button>
-      </div>`;
-    });
-  }
-
-  render();
-
-  if ("serviceWorker" in navigator)
-    navigator.serviceWorker.register("service-worker.js");
-</script>
+<script src="script.js"></script>
 </body>
 </html>
