@@ -1,22 +1,36 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>StreakQuest — Gamified Habit Streaks</title>
+  <title>StreakQuest — Link Invite Mode</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div id="app">
+  <div id="root">
 
-    <!-- LOGIN / SIGNUP -->
-    <section id="auth" class="card center">
-      <h1 class="logo">🔥 StreakQuest</h1>
+    <!-- TOKEN GATE -->
+    <section id="gate" class="card center">
+      <h1>🔐 StreakQuest — Invite Only</h1>
+      <p id="gate-desc">Provide a valid invite link or token to continue.</p>
+      <input id="tokenInput" placeholder="Paste token or visit link with #token=..." />
+      <div class="row">
+        <button id="btn-validate">Validate Token</button>
+        <button id="btn-skip" title="(Admin only) admin login">Admin</button>
+      </div>
+      <p id="gate-msg" class="msg"></p>
+      <small>Or open invite link: <code>#token=YOURTOKEN</code></small>
+    </section>
+
+    <!-- AUTH / MAIN (hidden until token validated) -->
+    <section id="auth" class="card hidden">
+      <h2>Account - Local (Device)</h2>
+
       <div id="auth-forms">
         <div id="login-form" class="form">
           <input id="login-username" placeholder="Username" />
-          <input id="login-password" placeholder="Password" type="password" />
+          <input id="login-password" type="password" placeholder="Password" />
           <div class="row">
             <button id="btn-login">Login</button>
             <button id="show-signup">Create Account</button>
@@ -27,8 +41,6 @@
         <div id="signup-form" class="form hidden">
           <input id="signup-username" placeholder="Choose username" />
           <input id="signup-password" placeholder="Choose password" type="password" />
-          <p>Select an avatar</p>
-          <div id="avatar-list" class="avatar-list"></div>
           <div class="row">
             <button id="btn-signup">Create</button>
             <button id="show-login">Back</button>
@@ -39,17 +51,16 @@
     </section>
 
     <!-- MAIN APP -->
-    <section id="main" class="hidden">
+    <section id="app" class="hidden">
       <header class="app-header">
         <div class="left">
-          <img id="user-avatar" src="" class="avatar" alt="avatar" />
           <div>
             <h2 id="user-greet">Welcome</h2>
             <small id="user-level">Level 1 • XP: 0</small>
           </div>
         </div>
         <div class="right">
-          <button id="btn-sync" title="Refresh/Sync">🔄</button>
+          <button id="btn-refresh" title="Refresh">🔄</button>
           <button id="btn-logout" title="Logout">⏏</button>
         </div>
       </header>
@@ -69,13 +80,43 @@
         </section>
 
         <section class="card">
-          <h3>Leaderboard</h3>
+          <h3>Leaderboard (local)</h3>
           <div id="leaderboard"></div>
         </section>
       </main>
+    </section>
 
-      <!-- floating XP animation -->
-      <div id="fx-layer"></div>
+    <!-- ADMIN PANEL (hidden, protected by admin password) -->
+    <section id="admin" class="card hidden">
+      <h2>Admin — Token Manager</h2>
+      <p class="msg">Generate tokens, set expiry, single-use or multi-use, then export tokens.json and upload to GitHub repo (root).</p>
+
+      <div class="row">
+        <input id="admin-pass" type="password" placeholder="Admin password" />
+        <button id="btn-admin-login">Unlock Admin</button>
+      </div>
+
+      <div id="admin-panel" class="hidden">
+        <div class="row">
+          <input id="new-token-prefix" placeholder="Optional prefix (e.g. INVITE-)" />
+          <select id="new-token-type">
+            <option value="single">Single-use</option>
+            <option value="multi">Multi-use</option>
+          </select>
+          <input id="new-token-uses" type="number" min="1" value="1" style="width:80px" />
+          <input id="new-token-days" type="number" min="0" value="7" style="width:80px" />
+          <button id="btn-generate">Generate</button>
+        </div>
+
+        <div style="margin-top:10px">
+          <button id="btn-export-json">Export tokens.json (download)</button>
+          <button id="btn-copy-json">Copy tokens.json to clipboard</button>
+          <button id="btn-reset-all">Reset (delete all tokens)</button>
+        </div>
+
+        <h4>Active tokens</h4>
+        <div id="token-list" style="max-height:240px;overflow:auto"></div>
+      </div>
     </section>
 
   </div>
@@ -84,6 +125,7 @@
   <script src="app.js"></script>
 
   <script>
+    // register service worker
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js').catch(()=>{});
     }
