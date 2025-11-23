@@ -1,48 +1,8 @@
-body {
-  font-family: Arial, sans-serif;
-  text-align: center;
-  background: #121212;
-  color: white;
-}
-
-input {
-  padding: 8px;
-  margin: 5px;
-  border-radius: 5px;
-}
-
-button {
-  padding: 8px 15px;
-  margin: 5px;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.hidden {
-  display: none;
-}
-
-.task {
-  background: #1f1f1f;
-  border: 1px solid gray;
-  padding: 10px;
-  margin: 10px auto;
-  width: 50%;
-  border-radius: 10px;
-}
-
-.fire {
-  animation: burn 1s infinite alternate;
-  font-size: 25px;
-}
-
-@keyframes burn {
-  0% { text-shadow: 0 0 5px orange; }
-  100% { text-shadow: 0 0 20px red; }
-}
-
-.logout {
-  background: red;
-  color: white;
-  margin-top: 20px;
-}
+body { background: #121212; color: white; font-family: Arial; text-align:center; padding:20px; }
+.hidden { display:none; }
+input { padding:10px; margin:10px; width:200px; border-radius:5px; }
+button { padding:10px 20px; margin:10px; cursor:pointer; border-radius:5px; }
+.task { background:#1f1f1f; margin:15px auto; width:50%; padding:15px; border-radius:10px; }
+.fire { font-size:30px; animation: flame 1s infinite alternate; }
+@keyframes flame { 0% { text-shadow:0 0 5px orange; } 100% { text-shadow:0 0 20px red; } }
+.logout { background:red; color:white; }
