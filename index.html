@@ -1,30 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>🔥 Streak Tracker</title>
   <link rel="stylesheet" href="style.css">
   <link rel="manifest" href="manifest.json">
 </head>
 <body>
+
 <div id="login-screen" class="center">
   <h1>🔥 Streak Tracker</h1>
-  <input id="username" placeholder="Enter Username">
-  <button onclick="login()">Login</button>
+  <button id="googleLogin">Sign in with Google</button>
 </div>
 
-<div id="main-screen" class="hidden">
+<div id="app-screen" class="hidden">
   <h2 id="welcome"></h2>
 
-  <input id="taskInput" placeholder="Add a new task...">
-  <button onclick="addTask()">Add Task</button>
+  <input id="taskInput" placeholder="Add task...">
+  <button onclick="addTask()">Add</button>
 
+  <h3>Your Streaks ⏳</h3>
   <div id="taskList"></div>
+
+  <h3>Leaderboard 🏆</h3>
+  <div id="leaderboard"></div>
 
   <button class="logout" onclick="logout()">Logout</button>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js"></script>
+<script src="firebase.js"></script>
 <script src="script.js"></script>
+
 </body>
 </html>
